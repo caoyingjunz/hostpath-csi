@@ -1,5 +1,5 @@
 /*
-Copyright 2021 The Pixiu Authors.
+Copyright 2021 The Caoyingjunz Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"k8s.io/klog/v2"
 )
 
 const (
-	DefaultDriverName = "nfs.csi.pixiu.io"
+	DefaultDriverName = "localstorage.csi.pixiu.io"
 )
 
 var (
@@ -39,5 +38,6 @@ func main() {
 	klog.InitFlags(nil)
 	flag.Parse()
 
-	fmt.Println("starting")
+	klog.Info("starting")
+	klog.V(2).Info("v2 starting")
 }
