@@ -18,7 +18,6 @@ package localstorage
 
 import (
 	"k8s.io/klog/v2"
-	"sync"
 )
 
 const (
@@ -27,8 +26,6 @@ const (
 
 type localStorage struct {
 	config Config
-
-	mutex sync.Mutex
 }
 
 type Config struct {
@@ -47,6 +44,10 @@ func NewLocalStorage(cfg Config) (*localStorage, error) {
 }
 
 func (ls *localStorage) Run() error {
+	s := NewNonBlockingGRPCServer()
+
+	s.Start(ls.config.Endpoint, ls, ls, ls)
+	s.Wait()
 
 	return nil
 }

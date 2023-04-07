@@ -51,7 +51,7 @@ func main() {
 		klog.Fatalf("Failed to initialize localstorage driver :%v", err)
 	}
 
-	if err := driver.Run(); err != nil {
+	if err = driver.Run(); err != nil {
 		klog.Fatalf("Failed to run localstorage driver :%v", err)
 	}
 }
