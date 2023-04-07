@@ -17,7 +17,6 @@ limitations under the License.
 package localstorage
 
 import (
-	"fmt"
 	"k8s.io/klog/v2"
 	"sync"
 )
@@ -39,14 +38,6 @@ type Config struct {
 }
 
 func NewLocalStorage(cfg Config) (*localStorage, error) {
-	if len(cfg.DriverName) == 0 {
-		return nil, fmt.Errorf("no driver name provided")
-	}
-
-	if len(cfg.Endpoint) == 0 {
-		return nil, fmt.Errorf("no driver endpoint provided")
-	}
-
 	klog.V(2).Infof("Driver: %v version: %v", cfg.DriverName, cfg.Version)
 
 	ls := &localStorage{
