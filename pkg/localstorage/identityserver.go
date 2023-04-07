@@ -21,8 +21,6 @@ import (
 
 	"github.com/container-storage-interface/spec/lib/go/csi"
 	"github.com/golang/protobuf/ptypes/wrappers"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type IdentityServer struct {
@@ -30,17 +28,7 @@ type IdentityServer struct {
 }
 
 func (ls *localStorage) GetPluginInfo(ctx context.Context, req *csi.GetPluginInfoRequest) (*csi.GetPluginInfoResponse, error) {
-	if ls.config.DriverName == "" {
-		return nil, status.Error(codes.Unavailable, "Driver name not configured")
-	}
-	if ls.config.Version == "" {
-		return nil, status.Error(codes.Unavailable, "Driver is missing version")
-	}
-
-	return &csi.GetPluginInfoResponse{
-		Name:          ls.config.DriverName,
-		VendorVersion: ls.config.Version,
-	}, nil
+	return &csi.GetPluginInfoResponse{}, nil
 }
 
 func (ls *localStorage) Probe(ctx context.Context, req *csi.ProbeRequest) (*csi.ProbeResponse, error) {
@@ -48,15 +36,5 @@ func (ls *localStorage) Probe(ctx context.Context, req *csi.ProbeRequest) (*csi.
 }
 
 func (ls *localStorage) GetPluginCapabilities(ctx context.Context, req *csi.GetPluginCapabilitiesRequest) (*csi.GetPluginCapabilitiesResponse, error) {
-	return &csi.GetPluginCapabilitiesResponse{
-		Capabilities: []*csi.PluginCapability{
-			{
-				Type: &csi.PluginCapability_Service_{
-					Service: &csi.PluginCapability_Service{
-						Type: csi.PluginCapability_Service_CONTROLLER_SERVICE,
-					},
-				},
-			},
-		},
-	}, nil
+	return &csi.GetPluginCapabilitiesResponse{}, nil
 }

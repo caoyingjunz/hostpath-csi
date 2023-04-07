@@ -67,7 +67,7 @@ func (s *nonBlockingGRPCServer) ForceStop() {
 }
 
 func (s *nonBlockingGRPCServer) serve(endpoint string, ids csi.IdentityServer, cs csi.ControllerServer, ns csi.NodeServer) {
-	proto, addr, err := ParseEndpoint(endpoint)
+	proto, addr, err := parseEndpoint(endpoint)
 	if err != nil {
 		klog.Fatal(err.Error())
 	}
