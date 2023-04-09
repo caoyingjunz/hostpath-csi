@@ -18,6 +18,7 @@ package localstorage
 
 import (
 	"github.com/container-storage-interface/spec/lib/go/csi"
+	"github.com/google/uuid"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -36,8 +37,7 @@ func (ls *localStorage) CreateVolume(ctx context.Context, req *csi.CreateVolumeR
 		return nil, status.Error(codes.InvalidArgument, "Volume Capabilities missing in request")
 	}
 
-	// TODO
-	volumeID := "volumeID"
+	volumeID := uuid.New().String()
 	topologies := []*csi.Topology{}
 
 	return &csi.CreateVolumeResponse{
