@@ -21,15 +21,44 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"k8s.io/klog/v2"
 )
 
 // CreateVolume create a volume
 func (ls *localStorage) CreateVolume(ctx context.Context, req *csi.CreateVolumeRequest) (*csi.CreateVolumeResponse, error) {
-	return nil, nil
+	name := req.GetName()
+	if len(name) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "CreateVolume name must be provided")
+	}
+
+	caps := req.GetVolumeCapabilities()
+	if caps == nil {
+		return nil, status.Error(codes.InvalidArgument, "Volume Capabilities missing in request")
+	}
+
+	// TODO
+	volumeID := "volumeID"
+	topologies := []*csi.Topology{}
+
+	return &csi.CreateVolumeResponse{
+		Volume: &csi.Volume{
+			VolumeId:           volumeID,
+			CapacityBytes:      req.GetCapacityRange().GetRequiredBytes(),
+			VolumeContext:      req.GetParameters(),
+			ContentSource:      req.GetVolumeContentSource(),
+			AccessibleTopology: topologies,
+		},
+	}, nil
 }
 
 // DeleteVolume delete a volume
 func (ls *localStorage) DeleteVolume(ctx context.Context, req *csi.DeleteVolumeRequest) (*csi.DeleteVolumeResponse, error) {
+	if len(req.GetVolumeId()) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "Volume ID missing in request")
+	}
+	volId := req.GetVolumeId()
+	klog.Infof("volume %v successfully deleted", volId)
+
 	return &csi.DeleteVolumeResponse{}, nil
 }
 
