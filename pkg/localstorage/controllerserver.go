@@ -87,7 +87,9 @@ func (ls *localStorage) GetCapacity(ctx context.Context, req *csi.GetCapacityReq
 }
 
 func (ls *localStorage) ControllerGetCapabilities(ctx context.Context, req *csi.ControllerGetCapabilitiesRequest) (*csi.ControllerGetCapabilitiesResponse, error) {
-	return nil, nil
+	return &csi.ControllerGetCapabilitiesResponse{
+		Capabilities: ls.getControllerServiceCapabilities(),
+	}, nil
 }
 
 func (ls *localStorage) CreateSnapshot(ctx context.Context, req *csi.CreateSnapshotRequest) (*csi.CreateSnapshotResponse, error) {
@@ -104,4 +106,29 @@ func (ls *localStorage) ListSnapshots(ctx context.Context, req *csi.ListSnapshot
 
 func (ls *localStorage) ControllerExpandVolume(ctx context.Context, req *csi.ControllerExpandVolumeRequest) (*csi.ControllerExpandVolumeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "")
+}
+
+func (ls *localStorage) getControllerServiceCapabilities() []*csi.ControllerServiceCapability {
+	cl := []csi.ControllerServiceCapability_RPC_Type{
+		csi.ControllerServiceCapability_RPC_CREATE_DELETE_VOLUME,
+		csi.ControllerServiceCapability_RPC_GET_VOLUME,
+		csi.ControllerServiceCapability_RPC_GET_CAPACITY,
+		csi.ControllerServiceCapability_RPC_LIST_VOLUMES,
+		csi.ControllerServiceCapability_RPC_VOLUME_CONDITION,
+		csi.ControllerServiceCapability_RPC_SINGLE_NODE_MULTI_WRITER,
+		csi.ControllerServiceCapability_RPC_PUBLISH_UNPUBLISH_VOLUME,
+	}
+
+	var csc []*csi.ControllerServiceCapability
+	for _, cap := range cl {
+		csc = append(csc, &csi.ControllerServiceCapability{
+			Type: &csi.ControllerServiceCapability_Rpc{
+				Rpc: &csi.ControllerServiceCapability_RPC{
+					Type: cap,
+				},
+			},
+		})
+	}
+
+	return csc
 }
