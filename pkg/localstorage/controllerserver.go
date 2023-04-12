@@ -17,6 +17,9 @@ limitations under the License.
 package localstorage
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/container-storage-interface/spec/lib/go/csi"
 	"github.com/google/uuid"
 	"golang.org/x/net/context"
@@ -37,7 +40,16 @@ func (ls *localStorage) CreateVolume(ctx context.Context, req *csi.CreateVolumeR
 		return nil, status.Error(codes.InvalidArgument, "Volume Capabilities missing in request")
 	}
 
+	ls.lock.Lock()
+	defer ls.lock.Unlock()
+
 	volumeID := uuid.New().String()
+	// TODO: 临时实现，后续修改
+	err := os.MkdirAll(ls.parseVolumePath(volumeID), 0777)
+	if err != nil {
+		return nil, err
+	}
+
 	topologies := []*csi.Topology{}
 
 	return &csi.CreateVolumeResponse{
@@ -56,10 +68,23 @@ func (ls *localStorage) DeleteVolume(ctx context.Context, req *csi.DeleteVolumeR
 	if len(req.GetVolumeId()) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "Volume ID missing in request")
 	}
-	volId := req.GetVolumeId()
-	klog.Infof("volume %v successfully deleted", volId)
 
+	ls.lock.Lock()
+	defer ls.lock.Unlock()
+
+	volId := req.GetVolumeId()
+	// TODO: 临时处理
+	if err := os.RemoveAll(ls.parseVolumePath(volId)); err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
+
+	klog.Infof("volume %v successfully deleted", volId)
 	return &csi.DeleteVolumeResponse{}, nil
+}
+
+// parseVolumePath returns the canonical path for volume
+func (ls *localStorage) parseVolumePath(volID string) string {
+	return filepath.Join(ls.config.VolumeDir, volID)
 }
 
 func (ls *localStorage) ControllerPublishVolume(ctx context.Context, req *csi.ControllerPublishVolumeRequest) (*csi.ControllerPublishVolumeResponse, error) {
