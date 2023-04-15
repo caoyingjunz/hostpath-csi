@@ -6,6 +6,8 @@ This driver allows Kubernetes to access LocalStorage on Linux node.
 [![Release][release-image]][release-url]
 [![License][license-image]][license-url]
 
+mirror of https://github.com/caoyingjunz/csi-driver-localstorage
+
 ## 学习分享
 - [go-learning](https://github.com/caoyingjunz/go-learning)
 
