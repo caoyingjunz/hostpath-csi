@@ -17,16 +17,22 @@ limitations under the License.
 package localstorage
 
 import (
+	"fmt"
 	"k8s.io/klog/v2"
+	"path"
 	"sync"
+
+	"github.com/caoyingjunz/csi-driver-localstorage/pkg/cache"
 )
 
 const (
 	DefaultDriverName = "localstorage.csi.caoyingjunz.io"
+	StoreFile         = "localstorage.json"
 )
 
 type localStorage struct {
 	config Config
+	cache  cache.Cache
 
 	lock sync.Mutex
 }
@@ -35,15 +41,33 @@ type Config struct {
 	DriverName    string
 	Endpoint      string
 	VendorVersion string
+	NodeId        string
 	// Deprecated: 临时使用，后续删除
 	VolumeDir string
 }
 
 func NewLocalStorage(cfg Config) (*localStorage, error) {
-	klog.V(2).Infof("Driver: %v version: %v", cfg.DriverName, cfg.VendorVersion)
+	if cfg.DriverName == "" {
+		return nil, fmt.Errorf("no driver name provided")
+	}
+	if len(cfg.NodeId) == 0 {
+		return nil, fmt.Errorf("no node id provided")
+	}
+	klog.V(2).Infof("Driver: %v version: %v, nodeId: %v", cfg.DriverName, cfg.VendorVersion, cfg.NodeId)
 
+	if err := makeVolumeDir(cfg.VolumeDir); err != nil {
+		return nil, err
+	}
+	storeFile := path.Join(cfg.VolumeDir, StoreFile)
+	klog.V(2).Infof("localstorage will be store in %s", storeFile)
+
+	s, err := cache.New(storeFile)
+	if err != nil {
+		return nil, err
+	}
 	return &localStorage{
 		config: cfg,
+		cache:  s,
 	}, nil
 }
 
