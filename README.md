@@ -1,12 +1,48 @@
-# LocalStorage Overview
-
-This driver allows Kubernetes to access LocalStorage on Linux node.
+# LocalStorage
 
 ![Build Status][build-url]
 [![Release][release-image]][release-url]
 [![License][license-image]][license-url]
 
-mirror of https://github.com/caoyingjunz/csi-driver-localstorage
+## Overview
+This driver allows Kubernetes to access LocalStorage on Linux node.
+
+## Getting Started
+
+### Installation
+- 安装 `csi-localstorage` 组件
+    ```shell
+    kubectl apply -f deploy/v1.0.0
+
+    # 验证
+    kubectl get pod -l app=csi-ls-node -n kube-system
+    NAME                        READY   STATUS    RESTARTS   AGE
+    pixiu-hostpath-node-7945j   3/3     Running   0          8m22s
+    ```
+
+- 安装 `storageclass`
+    ```shell
+    kubectl apply -f deploy/storageclass.yaml
+
+    # 验证
+    kubectl get sc hostpath.caoyingjunz.io
+    NAME                      PROVISIONER                       RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+    hostpath.caoyingjunz.io   localstorage.csi.caoyingjunz.io   Delete          WaitForFirstConsumer   false                  2m54s
+    ```
+
+- 创建 `pvc` 验证
+    ```shell
+    kubectl apply -f examples/pvc.yaml
+
+    # 验证
+    kubectl get pvc
+    NAME                 STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS              AGE
+    test-pvc             Bound    pvc-2b2c809f-33b5-437f-a4b8-61906c10a3e1   1Mi        RWX            hostpath.caoyingjunz.io   5s
+    ```
+
+## Feature
+- Schedule with volume status
+- Volume metrics
 
 ## 学习分享
 - [go-learning](https://github.com/caoyingjunz/go-learning)
